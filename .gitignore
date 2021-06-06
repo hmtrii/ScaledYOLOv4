@@ -1,3 +1,5 @@
 dataset/
 runs/
 fold*/
+mish-cuda/
+__pycache__/
