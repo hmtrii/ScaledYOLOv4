@@ -29,8 +29,19 @@ if __name__ == "__main__":
     fold = 0
     data_root = f"./fold{fold}"
     classes = df["class_name"].unique()
-    train_classes = np.delete(classes, np.where(classes=="No finding")).tolist()
-    class2id = {k:v for k, v in zip(train_classes, range(13))}
+    train_classes = ["Atelectasis",
+                    "Calcification",
+                    "Cardiomegaly",
+                    "Consolidation",
+                    "Diffuse Nodule",
+                    "Effusion",
+                    "Emphysema",
+                    "Fibrosis",
+                    "Fracture",
+                    "Mass",
+                    "Nodule",
+                    "Pleural Thickening",
+                    "Pneumothorax"]
 
     os.makedirs(f"{data_root}/images/train", exist_ok=True)
     os.makedirs(f"{data_root}/images/val", exist_ok=True)
@@ -45,13 +56,13 @@ if __name__ == "__main__":
             x, y, w, h = xyxy2xywh(row.x_min, row.y_min, row.x_max, row.y_max, row.width, row.height)
             if row.fold != 0:
                 f = open(f"{data_root}/labels/train/{name}.txt", "a")
-                f.write(f"{class2id[row.class_name]} {x} {y} {w} {h}\n")
+                f.write(f"{row.class_id} {x} {y} {w} {h}\n")
                 f.close()
                 train_files.add(f"./images/train/{row.image_id}")
                 shutil.copy(f"./dataset/train/{row.image_id}", f"{data_root}/images/train")
             else:
                 f = open(f"{data_root}/labels/val/{name}.txt", "a")
-                f.write(f"{class2id[row.class_name]} {x} {y} {w} {h}\n")
+                f.write(f"{row.class_id} {x} {y} {w} {h}\n")
                 f.close()
                 val_files.add(f"./images/val/{row.image_id}")
                 shutil.copy(f"./dataset/train/{row.image_id}", f"{data_root}/images/val")
@@ -59,6 +70,7 @@ if __name__ == "__main__":
     with open(f"{data_root}/train.txt", "w") as f:
         for p in list(train_files):
             f.write(p + "\n")
+            
     with open(f"{data_root}/val.txt", "w") as f:
         for p in list(val_files):
             f.write(p + "\n")
